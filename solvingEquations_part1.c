@@ -37,22 +37,37 @@ int sameIdentifier (char *s, char *variable) {
   return 0; // When *variable == NULL or *variable != *s, they are not the same identifiers
 }
 
-int acceptFactor(List *lp) { 
-  // to do: valueIdentifier, sameIdentifier, acceptFactor
+// Returns 1 when 1) there is no power (^) or 2) if there is a valid power
+int hasValidPower (List potEq, int *maxDeg) {
+  int degree;
+  if ( acceptCharacter(potEq,'^') ) {
+	  if ( valueNumber(potEq, &degree) ) {
+	    if (degree > *maxDeg) *maxDeg = degree;
+	  } else {
+		return 0;
+	  }
+  }
+  return 1;
 }
 
 int isTerm (List *potEq, int *var, int *maxDeg, char *variable) {
-  if ( acceptNumber(...) ) {
-	  acceptFactor(...); //value of acceptFactor is not used?
-  } else if (acceptFactor(...) ) {
-	  return 1;
+  if ( !acceptNumber(potEq) ) {
+	if ( !valueIdentifier(potEq, var) ) {
+	  return 0;
+	} else {
+	  if ( !hasValidPower(potEq, maxDeg) return 0;
+	}
+  } else {
+	if ( valueIdentifier(potEq, var) ) {
+	  if ( !hasValidPower(potEq, maxDeg) ) return 0;
+    }
   }
-  return 0;
+  return 1;
 }
 
 int isExpression(List *potEq, int *var, int *maxDeg, char *variable) {
   if ( !isTerm(potEq, var, maxDeg, variable) ) {
-    return 0; 
+    return 0;
   }
   while ( acceptCharacter(potEq,'+') || acceptCharacter(potEq,'-') ) {
     if ( !isTerm(potEq, var, deg, variable) ) {
@@ -88,14 +103,14 @@ int main(int argc, char *argv[]) {
 	while (s[0] != '!') {
 		List potentialEquation = tokenList(s);
 		if (isEquation(potentialEquation, variable, degree)) {
-			printf("this is an equation");
+			printf("\nthis is an equation");
 			if (variable == 1) { // variable undefined
 				printf(" in 1 variable of degree %d\n\n", degree); // degree undefined
 			} else {
 				printf(", but not in 1 variable");
 			}
 		} else {
-			printf("this is not an equation\n\n");
+			printf("\nthis is not an equation\n\n");
 		}
 		free(s);
 		freeTokenList(potentialEquation);
