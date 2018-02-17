@@ -19,12 +19,21 @@ int degreePower (List *potEq, int *var, int *deg) {
   return 0;
 }
 
-int valueIdentifier (List *potEq, int *var, char *variable) {
-  if (*lp != NULL && (*lp)->tt == Identifier ) {
-	*variable = ((*potEq)->t).(*identifier);
-    *lp = (*lp)->next;
-    return 1;
-  }
+int valueIdentifier (List *potEq, char *variable) {
+  int i = 0;
+  if(*lp != NULL && (*lp)->tt == Identifier){
+      do{
+        if((*lp)->tt != Identifier){
+          *lp = (*lp)->next;
+          variable[i] = '\0';
+          return 1;
+        }
+        else{
+          variable[i] = ((*potEq)->t).(*identifier);
+          ++i;
+        }
+      }while(*lp != NULL && (*lp)->tt == Identifier);
+    }
   return 0;
 }
 
