@@ -32,17 +32,32 @@ int sameIdentifier (char *s, char *variable) {
   return 0; // When *variable == NULL or *variable != *s, they are not the same identifiers
 }
 
-int acceptFactor(List *lp) {
-  // to do: valueIdentifier, sameIdentifier, acceptFactor
+// Returns 1 when 1) there is no power (^) or 2) if there is a valid power
+int hasValidPower (List potEq, int *maxDeg) {
+  int degree;
+  if ( acceptCharacter(potEq,'^') ) {
+	  if ( valueNumber(potEq, &degree) ) {
+	    if (degree > *maxDeg) *maxDeg = degree;
+	  } else {
+		return 0;
+	  }
+  }
+  return 1;
 }
 
 int isTerm (List *potEq, int *var, int *maxDeg, char *variable) {
-  if ( acceptNumber(...) ) {
-	  acceptFactor(...); //value of acceptFactor is not used?
-  } else if (acceptFactor(...) ) {
-	  return 1;
+  if ( !acceptNumber(potEq) ) {
+    if ( !valueIdentifier(potEq, var) ) {
+      return 0;
+    } else {
+      if ( !hasValidPower(potEq, maxDeg) return 0;
+    }
+  } else {
+	if ( valueIdentifier(potEq, var) ) {
+	  if ( !hasValidPower(potEq, maxDeg) ) return 0;
+    }
   }
-  return 0;
+  return 1;
 }
 
 int isExpression(List *potEq, int *var, int *maxDeg, char *variable) {
