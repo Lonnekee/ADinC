@@ -10,15 +10,6 @@
  * - make acceptFactor
  */
 
-int degreePower (List *potEq, int *var, int *deg) {
-  int power;
-  if ( acceptCharacter(potEq,'^') && valueNumber(potEq, &power) ) {
-	if (power > degree) degree = power;
-	return 1;
-  }
-  return 0;
-}
-
 int valueIdentifier (List *potEq, int *var, char *variable) {
   if (*lp != NULL && (*lp)->tt == Identifier ) {
 	*variable = ((*potEq)->t).(*identifier);
@@ -70,7 +61,7 @@ int isExpression(List *potEq, int *var, int *maxDeg, char *variable) {
     return 0;
   }
   while ( acceptCharacter(potEq,'+') || acceptCharacter(potEq,'-') ) {
-    if ( !isTerm(potEq, var, deg, variable) ) {
+    if ( !isTerm(potEq, var, maxDeg, variable) ) {
       return 0;
     }
   } /* no + or -, so we reached the end of the expression */
@@ -78,15 +69,15 @@ int isExpression(List *potEq, int *var, int *maxDeg, char *variable) {
 }
 
 // Recognizer function.
-int isEquation(List *potEq, int *var, int *deg) {
+int isEquation(List *potEq, int *var, int *maxDeg) {
   char *variable = NULL;
-  if ( !isExpression(potEq, var, deg, variable) ) {
+  if ( !isExpression(potEq, var, maxDeg, variable) ) {
     return 0; 
   }
   if ( !acceptCharacter(potEq,'=') ) {
 	return 0;
   }
-  if ( !=isExpression(potEq, var, deg, variable) ) {
+  if ( !=isExpression(potEq, var, maxDeg, variable) ) {
 	return 0;
   }
   if ( acceptCharacter(potEq,'=') ) {
@@ -98,14 +89,15 @@ int isEquation(List *potEq, int *var, int *deg) {
 int main(int argc, char *argv[]) {
 	printf("give an equation: ");
 	char *s = readInput();
-	int variable, degree;
+	int variable = NULL;
+	int maxDegree = 0;
 	
 	while (s[0] != '!') {
 		List potentialEquation = tokenList(s);
-		if (isEquation(potentialEquation, variable, degree)) {
+		if (isEquation(potentialEquation, variable, maxDegree)) {
 			printf("\nthis is an equation");
 			if (variable == 1) { // variable undefined
-				printf(" in 1 variable of degree %d\n\n", degree); // degree undefined
+				printf(" in 1 variable of degree %d\n\n", maxDegree); // degree undefined
 			} else {
 				printf(", but not in 1 variable");
 			}
