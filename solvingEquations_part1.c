@@ -13,7 +13,7 @@
  */
 
 
- int valueIdentifier(List *potEq, char *c) {
+int valueIdentifier(List *potEq, char *c) {
    if (*potEq != NULL && (*potEq)->tt == Identifier) {
      c = ((*potEq)->t).identifier;
      *potEq = (*potEq)->next;
@@ -22,41 +22,51 @@
    return 0;
  }
 
- int differentIdentifier (char *s, char *variable) {
-   printf("we used differentIdentifier\n");
+int differentIdentifier (char *s, char *variable) {
+   printf("we used differentIdentifier\n\n");
+   printf("%s\n",&variable);
+   printf("%s\n",&s);
    if (*variable == 0) {
-     printf("We encountered the first identifier\n");
+     printf("We encountered the first identifier\n\n");
      *variable = *s;
    } else if (*s == *variable) {
-     printf("this identifier is same as the first one we encountered\n");
-     return 0;
+     printf("this identifier is same as the first one we encountered\n\n");
+
+          return 0;
    }
    return 1; // When *variable == NULL or *variable != *s, they are not the same identifiers
  }
 
 int isIdentifier (List *potEq, char *variable, int *var) {
-  printf("we used isIdentifier\n");
+  printf("we used isIdentifier\n\n");
   int i = 0;
   char s[100];
   if( valueIdentifier(potEq, &s[i]) ){
-    printf("This is an identifier\n");
+    printf("This is an identifier\n\n");
     do{
       i++;
     } while ( valueIdentifier(potEq, &s[i]) );
+    s[i] = '\0';
     *var += differentIdentifier(s, variable);
+    printf("%d\n\n", *var );
     return 1;
   }
   return 0;
 }
 
-
 // Returns 1 when 1) there is no power (^) or 2) if there is a valid power
 int hasValidPower (List *potEq, int *maxDeg) {
   double degree;
   if ( acceptCharacter(potEq,'^') ) {
+    printf("Power Detected\n\n");
 	  if ( valueNumber(potEq, &degree) ) {
-	    if ((int) degree > *maxDeg) *maxDeg = (int) degree;
+      printf("Has a power of %d\n\n",(int) degree );
+      if ((int) degree > *maxDeg){
+        *maxDeg = (int) degree;
+        printf("maxDegree == %d\n\n",*maxDeg);
+      }
 	  } else {
+      printf("Power is not valid\n\n");
 		return 0;
 	  }
   }
@@ -81,13 +91,13 @@ int isTerm (List *potEq, int *var, int *maxDeg, char *variable) {
 int isExpression (List *potEq, int *var, int *maxDeg, char *variable) {
   acceptCharacter(potEq,'-');
   if ( !isTerm(potEq, var, maxDeg, variable) ) {
-    printf("is not term\n");
+    printf("is not term\n\n");
     return 0;
   }
   while ( acceptCharacter(potEq,'+') || acceptCharacter(potEq,'-') ) {
-    printf("+ or - is read\n" );
+    printf("+ or - is read\n\n" );
     if ( !isTerm(potEq, var, maxDeg, variable) ) {
-      printf("is not term 2\n");
+      printf("is not term 2\n\n");
       return 0;
     }
   } /* no + or -, so we reached the end of the expression */
@@ -98,19 +108,19 @@ int isExpression (List *potEq, int *var, int *maxDeg, char *variable) {
 int isEquation(List *potEq, int *var, int *maxDeg) {
   char variable = 0;
   if ( !isExpression(potEq, var, maxDeg, &variable) ) {
-    printf("First part of isEquation\n" );
+    printf("First part of isEquation\n\n" );
     return 0;
   }
   if ( !acceptCharacter(potEq,'=') ) {
-    printf("Second part of isEquation\n" );
+    printf("Second part of isEquation\n\n" );
     return 0;
   }
   if ( !isExpression(potEq, var, maxDeg, &variable) ) {
-    printf("Third part of isEquation\n" );
+    printf("Third part of isEquation\n\n" );
     return 0;
   }
   if ( acceptCharacter(potEq,'=') ) {
-      printf("Fourth part of isEquation\n");
+      printf("Fourth part of isEquation\n\n");
      return 0;
   }
   return 1;
@@ -119,16 +129,16 @@ int isEquation(List *potEq, int *var, int *maxDeg) {
 int main(int argc, char *argv[]) {
 	printf("give an equation: ");
 	char *s = readInput();
-	int variable = 0;
+	int variablecount = 0;
 	int maxDegree = 0;
 
 	while (s[0] != '!') {
 		List potentialEquation = tokenList(s);
-		if (isEquation(&potentialEquation, &variable, &maxDegree)) {
+		if (isEquation(&potentialEquation, &variablecount, &maxDegree)) {
 			printf("\nthis is an equation");
-			if (variable == 1) { // variable undefined
+			if (variablecount == 1) { // variable undefined
 				printf(" in 1 variable of degree %d\n\n", maxDegree); // degree undefined
-			} else if (variable > 1) {
+			} else if (variablecount > 1) {
 				printf(", but not in 1 variable\n\n");
 			} else {
         printf(", but something went wrong in counting variables\n\n");
@@ -138,6 +148,7 @@ int main(int argc, char *argv[]) {
 		}
 		free(s);
 		freeTokenList(potentialEquation);
+    variablecount = 0;
 		printf("give an equation: ");
 		s = readInput();
 	}
